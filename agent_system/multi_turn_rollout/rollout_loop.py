@@ -23,6 +23,7 @@ from transformers import PreTrainedTokenizer
 import uuid
 from agent_system.multi_turn_rollout.utils import process_image, to_list_of_dict, torch_to_numpy, filter_group_data
 from agent_system.environments import EnvironmentManagerBase
+from agent_system.skill_opd.rollout_hook import maybe_export_rollout
 from typing import List, Dict
 from verl.protocol import pad_dataproto_to_divisor, unpad_dataproto
 
@@ -410,6 +411,17 @@ class TrajectoryCollector:
                     episode_rewards=episode_rewards, 
                     episode_lengths=episode_lengths,
                     )
+        maybe_export_rollout(
+            config=self.config,
+            tokenizer=self.tokenizer,
+            total_batch_list=total_batch_list,
+            total_infos=total_infos,
+            episode_rewards=episode_rewards,
+            episode_lengths=episode_lengths,
+            success=success,
+            traj_uid=traj_uid,
+            tool_callings=tool_callings,
+        )
         
         return total_batch_list, episode_rewards, episode_lengths, success, traj_uid, tool_callings
     
