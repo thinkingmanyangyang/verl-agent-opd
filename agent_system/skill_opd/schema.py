@@ -15,7 +15,11 @@ class RolloutStepRecord:
     done: bool | None
     active_mask: bool
     is_action_valid: bool | None
+    text_action: str | None = None
+    projected_action: Any | None = None
     response_token_ids: list[int] | None = None
+    response_mask: list[int] | None = None
+    rollout_log_probs: list[float] | None = None
     uid: str | None = None
     traj_uid: str | None = None
     data_source: str | None = None
@@ -36,4 +40,3 @@ class RolloutTrajectoryRecord:
     steps: list[RolloutStepRecord]
     success_metrics: dict[str, Any] = field(default_factory=dict)
     metadata: dict[str, Any] = field(default_factory=dict)
-

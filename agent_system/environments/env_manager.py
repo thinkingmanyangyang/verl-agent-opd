@@ -160,6 +160,8 @@ class AlfWorldEnvironmentManager(EnvironmentManagerBase):
         # add action_valid to infos
         for i, info in enumerate(infos):
             info['is_action_valid'] = to_numpy(valids[i])
+            info['raw_text_action'] = text_actions[i]
+            info['projected_action'] = actions[i]
 
         next_observations = {'text': full_text_obs, 'image': image_obs, 'anchor': text_obs}
         rewards = to_numpy(rewards)
@@ -282,6 +284,8 @@ class SokobanEnvironmentManager(EnvironmentManagerBase):
 
         for i, info in enumerate(infos):
             info['is_action_valid'] = to_numpy(valids[i])
+            info['raw_text_action'] = text_actions[i]
+            info['projected_action'] = actions[i]
 
         self.memory.store({'text_obs': self.pre_text_obs, 'action': [self.ACTION_LOOKUP[act] for act in actions]})
         if self.is_multi_modal:
@@ -417,6 +421,8 @@ class WebshopEnvironmentManager(EnvironmentManagerBase):
         # add action_valid to infos
         for i, info in enumerate(infos):
             info['is_action_valid'] = to_numpy(valids[i])
+            info['raw_text_action'] = text_actions[i]
+            info['projected_action'] = actions[i]
 
         rewards = to_numpy(rewards)
         dones = to_numpy(dones)
@@ -545,6 +551,8 @@ class AppWorldEnvironmentManager(EnvironmentManagerBase):
         # add action_valid to infos
         for i, info in enumerate(infos):
             info['is_action_valid'] = to_numpy(valids[i])
+            info['raw_text_action'] = text_actions[i]
+            info['projected_action'] = actions[i]
 
         next_observations = {'text': full_text_obs, 'image': None, 'anchor': text_obs}
         rewards = to_numpy(rewards)

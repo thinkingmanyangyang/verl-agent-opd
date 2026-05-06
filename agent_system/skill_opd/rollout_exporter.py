@@ -78,6 +78,25 @@ def _as_token_list(value: Any) -> list[int] | None:
     return tokens
 
 
+def _as_float_list(value: Any) -> list[float] | None:
+    value = _plain(value)
+    if value is None:
+        return None
+    if isinstance(value, (int, float)):
+        return [float(value)]
+    if not isinstance(value, list):
+        return None
+    if value and isinstance(value[0], list):
+        value = value[0]
+    floats: list[float] = []
+    for item in value:
+        try:
+            floats.append(float(item))
+        except (TypeError, ValueError):
+            return None
+    return floats
+
+
 def _get_first(data: dict[str, Any], keys: list[str]) -> Any:
     for key in keys:
         if key in data:
@@ -136,6 +155,21 @@ def _decode_response(data: dict[str, Any], tokenizer: Any) -> tuple[str | None, 
     return _decode_tokens(tokenizer, response_token_ids), response_token_ids
 
 
+def _response_mask_from_step(data: dict[str, Any]) -> list[int] | None:
+    explicit_mask = _as_token_list(_get_first(data, ["response_mask"]))
+    if explicit_mask is not None:
+        return explicit_mask
+
+    response_ids = _as_token_list(_get_first(data, ["responses"]))
+    attention_mask = _as_token_list(_get_first(data, ["attention_mask"]))
+    if response_ids is None or attention_mask is None:
+        return None
+    response_len = len(response_ids)
+    if response_len == 0 or len(attention_mask) < response_len:
+        return None
+    return attention_mask[-response_len:]
+
+
 def _value_at_index(value: Any, index: int) -> Any:
     value = _plain(value)
     if isinstance(value, list):
@@ -179,6 +213,7 @@ class RolloutExporter:
             ]
             last_active_index = active_indices[-1] if active_indices else None
             steps: list[RolloutStepRecord] = []
+            done_is_inferred = False
 
             for step_index in active_indices:
                 step_data = step_items[step_index]
@@ -199,16 +234,33 @@ class RolloutExporter:
                 if not self.export_config.include_token_ids:
                     response_token_ids = None
 
+                done = _as_bool(step_data.get("dones"))
+                if done is None:
+                    done = step_index == last_active_index if last_active_index is not None else None
+                    done_is_inferred = True
+
+                text_action = _get_first(step_data, ["text_action"])
+                if text_action is None:
+                    text_action = step_info.get("raw_text_action")
+
+                projected_action = _get_first(step_data, ["projected_action"])
+                if projected_action is None:
+                    projected_action = step_info.get("projected_action")
+
                 steps.append(
                     RolloutStepRecord(
                         step_id=step_index,
                         prompt_text=prompt_text,
                         response_text=response_text,
                         response_token_ids=response_token_ids,
+                        response_mask=_response_mask_from_step(step_data),
+                        rollout_log_probs=_as_float_list(_get_first(step_data, ["rollout_log_probs"])),
                         reward=_as_float(step_data.get("rewards")),
-                        done=step_index == last_active_index if last_active_index is not None else None,
+                        done=done,
                         active_mask=True,
                         is_action_valid=_as_bool(step_data.get("is_action_valid")),
+                        text_action=str(_plain(text_action)) if text_action is not None else None,
+                        projected_action=_plain(projected_action),
                         uid=str(_plain(step_data.get("uid"))) if step_data.get("uid") is not None else None,
                         traj_uid=(
                             str(_plain(step_data.get("traj_uid")))
@@ -240,7 +292,7 @@ class RolloutExporter:
                     metadata={
                         "schema_version": EXPORT_SCHEMA_VERSION,
                         "source": "verl-agent TrajectoryCollector.vanilla_multi_turn_loop",
-                        "done_is_inferred_from_episode_length": True,
+                        "done_is_inferred_from_episode_length": done_is_inferred,
                     },
                 )
             )
@@ -287,4 +339,3 @@ class RolloutExporter:
             if "success" in key or "won" in key:
                 return _as_bool(value)
         return None
-

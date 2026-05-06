@@ -377,6 +377,11 @@ class TrajectoryCollector:
             else:
                 batch.non_tensor_batch['is_action_valid'] = np.ones(batch_size, dtype=bool)
 
+            batch.non_tensor_batch['text_action'] = np.array(text_actions, dtype=object)
+            batch.non_tensor_batch['dones'] = torch_to_numpy(dones, is_object=True)
+            if 'projected_action' in infos[0]:
+                batch.non_tensor_batch['projected_action'] = np.array([info.get('projected_action') for info in infos], dtype=object)
+
             if 'tool_calling' in infos[0]:
                 tool_callings[active_masks] += np.array([info['tool_calling'] for info in infos], dtype=np.float32)[active_masks]
             # Create reward tensor, only assign rewards for active environments

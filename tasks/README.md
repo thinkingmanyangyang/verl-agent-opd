@@ -24,4 +24,5 @@ Task files:
 - `roadmap.md`: full project roadmap from rollout export to Skill-OPD training.
 - `phase1_sokoban_rollout.md`: server checklist for the first offline rollout.
 - `backlog.md`: concrete short-term tasks and blockers.
-
+- `dataset_code_audit.md`: end-to-end code audit for Sokoban, AppWorld, and WebShop.
+- `agentic_rollout_gap_list.md`: current env/rollout/exporter gaps and validation checklist.
