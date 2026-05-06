@@ -26,3 +26,5 @@ Task files:
 - `backlog.md`: concrete short-term tasks and blockers.
 - `dataset_code_audit.md`: end-to-end code audit for Sokoban, AppWorld, and WebShop.
 - `agentic_rollout_gap_list.md`: current env/rollout/exporter gaps and validation checklist.
+- `verl_training_flow_deep_dive.md`: detailed parquet/DataProto/rollout/reward/log-prob/advantage/loss flow.
+- `dataset_reading_notes.md`: file-by-file reading notes for trainer, rollout, and dataset env code.
