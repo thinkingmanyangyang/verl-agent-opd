@@ -28,3 +28,4 @@ Task files:
 - `agentic_rollout_gap_list.md`: current env/rollout/exporter gaps and validation checklist.
 - `verl_training_flow_deep_dive.md`: detailed parquet/DataProto/rollout/reward/log-prob/advantage/loss flow.
 - `dataset_reading_notes.md`: file-by-file reading notes for trainer, rollout, and dataset env code.
+- `development_handoff.md`: concise development log and handoff guide for the next agent.
