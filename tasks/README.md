@@ -29,3 +29,7 @@ Task files:
 - `verl_training_flow_deep_dive.md`: detailed parquet/DataProto/rollout/reward/log-prob/advantage/loss flow.
 - `dataset_reading_notes.md`: file-by-file reading notes for trainer, rollout, and dataset env code.
 - `development_handoff.md`: concise development log and handoff guide for the next agent.
+
+Related method docs:
+
+- `docs/skill_opd/skill_sd_reading_guide_zh.md`: Chinese reading guide for Skill-SD.
